@@ -90,6 +90,7 @@ def main():
     show_interval = config['show_interval']
     valid_interval = config['valid_interval']
     save_interval = config['save_interval']
+    save_interval_model = config['save_interval_model']
     cpu_workers = config['cpu_workers']
     reload_checkpoint = config['reload_checkpoint']
 
@@ -134,6 +135,7 @@ def main():
     criterion.to(device)
 
     assert save_interval % valid_interval == 0
+    bestAcc = -99
     i = 1
     for epoch in range(1, epochs + 1):
         print(f'epoch: {epoch}')
@@ -154,14 +156,20 @@ def main():
                                       beam_size=config['beam_size'])
                 print('valid_evaluation: loss={loss}, acc={acc}'.format(**evaluation))
 
-                if i % save_interval == 0:
-                    prefix = 'crnn'
-                    loss = evaluation['loss']
-                    acc = evaluation['acc']
+                loss = evaluation['loss']
+                acc = evaluation['acc']
+                prefix = 'crnn'
+
+                if i % save_interval == 0 and save_interval_model:
                     save_model_path = os.path.join(config['checkpoints_dir'],
                                                    f'{prefix}_{i:06}_loss{loss}_acc{acc}.pt')
                     torch.save(crnn.state_dict(), save_model_path)
                     print('save model at ', save_model_path)
+                if acc >= bestAcc:
+                    save_model_path = os.path.join(config['checkpoints_dir'],
+                                                   f'{prefix}_Best_Model_acc{acc}.pt')
+                    torch.save(crnn.state_dict(), save_model_path)
+                    print('save best model at ', save_model_path)
 
             i += 1
 

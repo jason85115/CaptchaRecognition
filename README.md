@@ -117,9 +117,8 @@ train_config = {
 1. 資料過少，且也懶得標記時，可參考 <span>GenFake.py</span>。
 
 ### 使用須知
-:::danger
 生成出來的圖片要與真實資料相近，且需訓練測試是否可以Work。
-:::
+
 
 
 
